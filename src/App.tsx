@@ -1,12 +1,11 @@
 import './App.css';
 
 import React, { useEffect, useState } from 'react';
-import { CountryService } from './CountryService';
+import { getCountries } from './CountryService';
 import { useFormik } from 'formik';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { Calendar } from 'primereact/calendar';
 import { Password } from 'primereact/password';
 import { Checkbox } from 'primereact/checkbox';
 import { Dialog } from 'primereact/dialog';
@@ -17,11 +16,6 @@ const App = () => {
   const [countries, setCountries] = useState([]);
   const [showMessage, setShowMessage] = useState(false);
   const [formData, setFormData]: any = useState({});
-  const countryservice = new CountryService();
-
-  useEffect(() => {
-    countryservice.getCountries().then((data) => setCountries(data));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const formik = useFormik({
     initialValues: {
@@ -64,6 +58,12 @@ const App = () => {
       formik.resetForm();
     },
   });
+
+  const fecthData = () => {
+    getCountries().then((data) => {
+      setCountries(data);
+    });
+  };
 
   const isFormFieldValid = (name: any) => {
     // return !!(formik.touched[name] && formik.errors[name]);
@@ -207,6 +207,7 @@ const App = () => {
                   <Dropdown
                     id="country"
                     name="country"
+                    data-testid="dropdown"
                     value={formik.values.country}
                     onChange={formik.handleChange}
                     options={countries}
@@ -235,7 +236,17 @@ const App = () => {
                 </label>
               </div>
 
-              <Button type="submit" label="Submit" className="mt-2" />
+              {countries.length > 0 ? <h1>Fetch Success</h1> : <h1>Failed </h1>}
+
+              <Button
+                type="submit"
+                label="Submit"
+                data-testid="fetchBtn"
+                className="mt-2"
+                onClick={() => {
+                  fecthData();
+                }}
+              />
             </form>
           </div>
         </div>
